@@ -1,3 +1,4 @@
+import { fetchProductsById } from "@/api/products"
 import { Box } from "@/components/ui/box"
 import { Button, ButtonText } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -5,17 +6,26 @@ import { Heading } from "@/components/ui/heading"
 import { Image } from "@/components/ui/image"
 import { Text } from "@/components/ui/text"
 import { VStack } from "@/components/ui/vstack"
+import { useQuery } from "@tanstack/react-query"
 import { Stack, useLocalSearchParams } from "expo-router";
-import products from "@/assets/products.json"
+import { ActivityIndicator } from "react-native"
+// import products from "@/assets/products.json"
 
 export default function ProductDetailsScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const product = products.find((p) => p.id === Number(id));
 
-    if (!product) {
-        return (
-            <Text>Product not found</Text>
-        )
+
+    const { data:product, isLoading, error } = useQuery({
+        queryKey: ['products', id],
+        queryFn: () => fetchProductsById(Number(id)),
+    });
+
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
+
+    if (error) {
+        return <Text>Product not found</Text>;
     }
 
     return (
