@@ -1,20 +1,36 @@
-import '../global.css'
-import { Stack } from "expo-router";
+import "../global.css";
+import { Link, Stack } from "expo-router";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Icon } from "@/components/ui/icon";
+import { ShoppingCart } from "lucide-react-native";
+import { Pressable,Text } from "react-native";
+import { useCart } from "@/store/cartStore";
 
-
-const quearyClient = new QueryClient();
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
+
+    const cartItemNum = useCart((state) => state.items.length);
+
     return (
-        <QueryClientProvider client={quearyClient}>
+        <QueryClientProvider client={queryClient}>
             <GluestackUIProvider>
-                <Stack>
-                    <Stack.Screen name='index' options={{ title: 'Shop' }} />
-                    <Stack.Screen name='product/[id]' options={{ title: 'Product' }} />
+                <Stack
+                    screenOptions={{
+                        headerRight: () =>
+                            <Link href={'/cart'} asChild>
+                                <Pressable className="flex-row gap-2 p-5">
+                                    <Icon as={ShoppingCart} />
+                                    <Text>{cartItemNum}</Text>
+                                </Pressable>
+                            </Link>,
+                    }}
+                >
+                    <Stack.Screen name="index" options={{ title: "Shop" }} />
+                    <Stack.Screen name="product/[id]" options={{ title: "Product" }} />
                 </Stack>
             </GluestackUIProvider>
         </QueryClientProvider>
-    )
+    );
 }
